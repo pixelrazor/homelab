@@ -1,0 +1,26 @@
+version: "3.6"
+services:
+  zwavejs:
+    container_name: "zwavejs"
+    devices:
+      - "/dev/serial/by-id/${ZWAVE_DEVICE_ID}:/dev/zwave"
+    environment:
+      - "TZ=${TZ}"
+    image: "zwavejs/zwave-js-ui:latest"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.zwavejs.entrypoints: "https"
+      traefik.http.routers.zwavejs.middlewares: "authelia@docker,internal-ipallowlist@docker"
+      traefik.http.services.zwavejs.loadbalancer.server.port: "8091"
+    networks:
+      - "traefik"
+    ports:
+      - "3000:3000/tcp"
+      - "8091:8091/tcp"
+    restart: "unless-stopped"
+    volumes:
+      - "${DATA_DIR}/zwavejs:/usr/src/app/store"
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}

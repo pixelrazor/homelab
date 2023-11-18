@@ -1,0 +1,24 @@
+version: "3.6"
+services:
+  gitea:
+    container_name: "gitea"
+    environment:
+      - "USER_UID=${PUID}"
+      - "USER_GID=${PGID}"
+      - "GITEA_CUSTOM=/data/gitea"
+    image: "gitea/gitea:1.19.0"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.gitea.entrypoints: "https"
+      traefik.http.services.gitea.loadbalancer.server.port: "3000"
+    networks:
+      - "traefik"
+    restart: "unless-stopped"
+    volumes:
+      - "${DATA_DIR}/gitea/data:/data"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}

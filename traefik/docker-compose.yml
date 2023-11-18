@@ -1,0 +1,33 @@
+version: "3.6"
+services:
+  traefik:
+    container_name: "traefik"
+    environment:
+      - "TZ=${TZ}"
+      - "CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    image: "traefik:3.0"
+    labels:
+      traefik.enable: "true"
+      traefik.http.middlewares.internal-ipallowlist.ipallowlist.sourcerange: "127.0.0.1/32,192.168.0.0/16,172.16.0.0/20"
+      traefik.http.middlewares.cloudflarewarp.plugin.cloudflarewarp.disabledefault: "false"
+      traefik.http.routers.dashboard.entrypoints: "https"
+      traefik.http.routers.dashboard.middlewares: "internal-ipallowlist@docker,authelia@docker"
+      traefik.http.routers.dashboard.service: "api@internal"
+      traefik.tcp.middlewares.internal-ipallowlist.ipallowlist.sourcerange: "127.0.0.1/32,192.168.0.0/16,172.16.0.0/20"
+    networks:
+      - "traefik"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "5432:5432"
+    restart: "unless-stopped"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "${DATA_DIR}/traefik/traefik.yaml:/etc/traefik/traefik.yaml:ro"
+      - "${DATA_DIR}/traefik/letsencrypt:/letsencrypt"
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}

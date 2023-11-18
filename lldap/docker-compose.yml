@@ -1,0 +1,25 @@
+version: "3.6"
+services:
+  lldap:
+    container_name: "lldap"
+    environment:
+      - "GID=${PGID}"
+      - "TZ=${TZ}"
+      - "UID=${PUID}"
+      - "LLDAP_JWT_SECRET=${LLDAP_JWT_SECRET}"
+    image: "nitnelave/lldap:latest"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.lldap.entrypoints: "https"
+      traefik.http.services.lldap.loadbalancer.server.port: "17170"
+    networks:
+      - "traefik"
+    ports:
+      - "3890:3890"
+    restart: "unless-stopped"
+    volumes:
+      - "${DATA_DIR}/lldap/data:/data"
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}

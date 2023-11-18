@@ -1,0 +1,49 @@
+version: "3.4"
+services:
+  broker:
+    image: docker.io/library/redis:7
+    restart: unless-stopped
+    volumes:
+      - ${DATA_DIR}/redis/data:/data
+  paperless:
+    container_name: "paperless"
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    restart: unless-stopped
+    depends_on:
+      - broker
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - ${DATA_DIR}/paperless/data:/usr/src/paperless/data
+      - ${DATA_DIR}/paperless/media:/usr/src/paperless/media
+      - ${DATA_DIR}/paperless/export:/usr/src/paperless/export
+      - ${DATA_DIR}/paperless/consume:/usr/src/paperless/consume
+    ports:
+      - "8000:8000"
+    environment:
+      - "PAPERLESS_REDIS=redis://broker:6379"
+      - "PAPERLESS_DBHOST=${PAPERLESS_DBHOST}"
+      - "PAPERLESS_DBNAME=${PAPERLESS_DBNAME}"
+      - "PAPERLESS_DBUSER=${PAPERLESS_DBUSER}"
+      - "PAPERLESS_DBPASS=${PAPERLESS_DBPASS}"
+      - "PAPERLESS_URL=https://paperless.${BASE_DOMAIN}"
+      - "PAPERLESS_TIME_ZONE=${TZ}"
+      - "PAPERLESS_OCR_LANGUAGE=eng"
+      - "USERMAP_UID=${PUID}"
+      - "USERMAP_GID=${PGID}"
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: ${TRAEFIK_NETWORK}
+      traefik.http.routers.paperless.entrypoints: "https"
+      traefik.http.routers.paperless.middlewares: "internal-ipallowlist@docker"
+      traefik.http.services.paperless.loadbalancer.server.port: "8000"
+    networks:
+      - "traefik"
+      - "default"
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}

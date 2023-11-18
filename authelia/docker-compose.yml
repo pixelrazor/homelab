@@ -1,0 +1,25 @@
+version: "3.6"
+services:
+  authelia:
+    container_name: "authelia"
+    environment:
+      - "PGID=${PGID}"
+      - "PUID=${PUID}"
+      - "TZ=${TZ}"
+    image: "authelia/authelia:latest"
+    labels:
+      traefik.enable: "true"
+      traefik.http.middlewares.authelia.forwardAuth.address: "http://authelia:9091/api/verify?rd=https%3A%2F%2Fauthelia.${BASE_DOMAIN}%3A18443%2F"
+      traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders: "Remote-User,Remote-Groups,Remote-Name,Remote-Email"
+      traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader: "true"
+      traefik.http.routers.authelia.entrypoints: "https"
+      traefik.http.services.authelia.loadbalancer.server.port: "9091"
+    networks:
+      - "traefik"
+    restart: "unless-stopped"
+    volumes:
+      - "${DATA_DIR}/authelia/config:/config"
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}

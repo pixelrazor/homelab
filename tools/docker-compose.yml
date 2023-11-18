@@ -1,0 +1,19 @@
+version: "3.6"
+services:
+  tools:
+    container_name: "tools"
+    environment:
+      - "TZ=${TZ}"
+    image: "corentinth/it-tools:latest"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.tools.entrypoints: "https"
+      traefik.http.routers.tools.middlewares: "internal-ipallowlist@docker"
+      traefik.http.services.tools.loadbalancer.server.port: "80"
+    networks:
+      - "traefik"
+    restart: "unless-stopped"
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}

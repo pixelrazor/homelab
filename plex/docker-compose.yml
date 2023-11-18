@@ -1,0 +1,44 @@
+version: "3.6"
+services:
+  plex:
+    container_name: "plex"
+    environment:
+      - "VERSION=docker"
+      - "PUID=${PUID}"
+      - "PGID=${PGID}"
+      - "TZ=${TZ}"
+    image: "ghcr.io/linuxserver/plex:latest"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.plex.entrypoints: "https"
+      traefik.http.services.plex.loadbalancer.server.port: "32400"
+    networks:
+      - "traefik"
+    ports:
+      - "32400:32400/tcp"
+    restart: "unless-stopped"
+    volumes:
+      - "${DATA_DIR}/plex/tv:/tv"
+      - "${DATA_DIR}/plex/config:/config"
+      - "${DATA_DIR}/plex/home_movies:/home_movies"
+      - "${DATA_DIR}/plex/movies:/movies"
+  tautulli:
+    container_name: "tautulli"
+    environment:
+      - "TZ=${TZ}"
+      - "PGID=${PGID}"
+      - "PUID=${PUID}"
+    image: "tautulli/tautulli:latest"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.tautulli.entrypoints: "https"
+      traefik.http.services.tautulli.loadbalancer.server.port: "8181"
+    networks:
+      - "traefik"
+    restart: "unless-stopped"
+    volumes:
+      - "${DATA_DIR}/tautulli:/config"
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}

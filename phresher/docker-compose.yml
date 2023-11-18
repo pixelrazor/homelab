@@ -1,0 +1,21 @@
+version: "3.6"
+services:
+  phresher:
+    container_name: "phresher"
+    environment:
+      - "TZ=${TZ}"
+      - "SPOTIFY_SECRET=${PHRESHER_SPOTIFY_SECRET}"
+      - "SPOTIFY_STATE=${PHRESHER_SPOTIFY_STATE}"
+      - "SPOTIFY_ID=${PHRESHER_SPOTIFY_ID}"
+    image: "pixelrazor/phresher:latest"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.phresher.entrypoints: "https"
+      traefik.http.services.phresher.loadbalancer.server.port: "80"
+    networks:
+      - "traefik"
+    restart: "unless-stopped"
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}

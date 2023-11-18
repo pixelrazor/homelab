@@ -1,0 +1,45 @@
+version: "3.6"
+services:
+  pgadmin:
+    container_name: "pgadmin"
+    depends_on:
+      - postgres-pixel
+    environment:
+      - "TZ=${TZ}"
+    image: "dpage/pgadmin4:latest"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.pgadmin.entrypoints: "https"
+      traefik.http.routers.pgadmin.middlewares: "authelia@docker,internal-ipallowlist@docker"
+      traefik.http.services.pgadmin.loadbalancer.server.port: "80"
+    networks:
+      - "traefik"
+    restart: "unless-stopped"
+    volumes:
+      - "${DATA_DIR}/pgadmin/config:/var/lib/pgadmin"
+  postgres-pixel:
+    container_name: "postgres-pixel"
+    environment:
+      - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
+      - "TZ=${TZ}"
+    image: "postgres:14"
+    labels:
+      traefik.enable: "true"
+      traefik.tcp.routers.postgres.entrypoints: "postgres"
+      traefik.tcp.routers.postgres.middlewares: "internal-ipallowlist@docker"
+      traefik.tcp.routers.postgres.rule: "HostSNI(`*`)"
+      traefik.tcp.services.postgres.loadbalancer.server.port: "5432"
+    networks:
+      - "traefik"
+    restart: "unless-stopped"
+    volumes:
+      - "${DATA_DIR}/postgres:/var/lib/postgresql/data"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}

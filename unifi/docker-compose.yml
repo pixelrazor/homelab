@@ -1,0 +1,43 @@
+version: "3.6"
+services:
+  unifi-db:
+    image: docker.io/mongo:4.4
+    container_name: unifi-db
+    volumes:
+      - ${DATA_DIR}/mongo/data:/data/db
+      - ${DATA_DIR}/mongo/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    restart: unless-stopped
+  unifi-network-application:
+    image: lscr.io/linuxserver/unifi-network-application:latest
+    container_name: unifi
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - MONGO_USER=${UNIFI_DB_USER}
+      - MONGO_PASS=${UNIFI_DB_PASS}
+      - MONGO_HOST=unifi-db
+      - MONGO_PORT=27017
+      - MONGO_DBNAME=${UNIFI_DB_NAME}
+    volumes:
+      - ${DATA_DIR}/config:/config
+    ports:
+      - 8443:8443
+      - 3478:3478/udp
+      - 10001:10001/udp
+      - 8080:8080
+    networks:
+      - default
+      - traefik
+    restart: unless-stopped
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: ${TRAEFIK_NETWORK}
+      traefik.http.routers.unifi.entrypoints: "https"
+      traefik.http.routers.unifi.middlewares: "internal-ipallowlist@docker"
+      traefik.http.services.unifi.loadbalancer.server.port: "8443"
+      traefik.http.services.unifi.loadbalancer.server.scheme: "https"
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}

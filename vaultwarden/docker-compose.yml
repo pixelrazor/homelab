@@ -1,0 +1,22 @@
+version: "3.6"
+services:
+  vaultwarden:
+    container_name: "vaultwarden"
+    environment:
+      - "TZ=${TZ}"
+      - "SIGNUPS_ALLOWED=false"
+    image: "vaultwarden/server:latest"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.vaultwarden.entrypoints: "https"
+      traefik.http.routers.vaultwarden.middlewares: "internal-ipallowlist@docker"
+      traefik.http.services.vaultwarden.loadbalancer.server.port: "80"
+    networks:
+      - "traefik"
+    restart: "unless-stopped"
+    volumes:
+      - "${DATA_DIR}/vaultwarden:/data"
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}

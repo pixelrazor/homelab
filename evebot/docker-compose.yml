@@ -1,0 +1,24 @@
+version: "3.6"
+services:
+  evebot:
+    container_name: "evebot"
+    environment:
+      - "DB_USER=${EVEBOT_DB_USER}"
+      - "DB_PASS=${EVEBOT_DB_PASS}"
+      - "DB_NAME=${EVEBOT_DB_NAME}"
+      - "TZ=${TZ}"
+      - "EVE_BOT=${EVEBOT_DISCORD_KEY}"
+      - "DB_HOST=${EVEBOT_DB_HOST}"
+    image: "pixelrazor/evebot:latest"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.evebot.entrypoints: "https"
+      traefik.http.routers.evebot.rule: "Host(`bots.${BASE_DOMAIN}`) && Path(`/evebot`)"
+      traefik.http.services.evebot.loadbalancer.server.port: "8086"
+    networks:
+      - "traefik"
+    restart: "unless-stopped"
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}
