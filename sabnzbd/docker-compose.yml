@@ -1,0 +1,24 @@
+version: "3.6"
+services:
+  sabnzbd:
+    container_name: sabnzbd
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    image: lscr.io/linuxserver/sabnzbd:latest
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.sabnzbd.entrypoints: https
+      traefik.http.routers.sabnzbd.middlewares: authelia@docker,internal-ipallowlist@docker
+      traefik.http.services.sabnzbd.loadbalancer.server.port: "8080"
+    networks:
+      - traefik
+    restart: unless-stopped
+    volumes:
+      - ${DATA_DIR}/sabnzbd/config:/config
+      - ${DATA_DIR}/data/usenet:/data/usenet
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}

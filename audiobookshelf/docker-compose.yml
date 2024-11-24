@@ -1,0 +1,22 @@
+version: "3.6"
+services:
+  audiobookshelf:
+    container_name: audiobookshelf
+    environment:
+      - TZ=${TZ}
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.audiobookshelf.entrypoints: https
+      traefik.http.services.audiobookshelf.loadbalancer.server.port: "80"
+    networks:
+      - traefik
+    restart: unless-stopped
+    volumes:
+      - ${DATA_DIR}/audiobookshelf/config:/config
+      - ${DATA_DIR}/data/media/books:/books
+      - ${DATA_DIR}/audiobookshelf/metadata:/metadata
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}

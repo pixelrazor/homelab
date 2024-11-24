@@ -1,0 +1,26 @@
+version: "3.6"
+services:
+  linkstack:
+    container_name: linkstack
+    environment:
+      - TZ=${TZ}
+      - SERVER_ADMIN=${EMAIL}
+      - HTTP_SERVER_NAME=linkstack.${BASE_DOMAIN}
+      - HTTPS_SERVER_NAME=linkstack.${BASE_DOMAIN}
+    image: linkstackorg/linkstack:latest
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.linkstack.entrypoints: https
+      traefik.http.services.linkstack.loadbalancer.server.port: "443"
+      traefik.http.services.linkstack.loadbalancer.server.scheme: "https"
+    networks:
+      - traefik
+    restart: unless-stopped
+    ports:
+      - 8843:80
+    volumes:
+      - ${DATA_DIR}/linkstack/htdocs:/htdocs
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}

@@ -1,0 +1,24 @@
+version: "3.6"
+services:
+  dockge:
+    container_name: "dockge"
+    environment:
+      - "TZ=${TZ}"
+      - "DOCKGE_STACKS_DIR=${DOCKGE_STACKS_DIR}"
+    image: "louislam/dockge:1"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.dockge.entrypoints: "https"
+      traefik.http.routers.dockge.middlewares: "authelia@docker,internal-ipallowlist@docker"
+      traefik.http.services.dockge.loadbalancer.server.port: "5001"
+    networks:
+      - "traefik"
+    restart: "unless-stopped"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "${DATA_DIR}/dockge:/app/data"
+      - "${DOCKGE_STACKS_DIR}:${DOCKGE_STACKS_DIR}"
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}

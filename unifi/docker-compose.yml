@@ -20,7 +20,7 @@ services:
       - MONGO_PORT=27017
       - MONGO_DBNAME=${UNIFI_DB_NAME}
     volumes:
-      - ${DATA_DIR}/config:/config
+      - ${DATA_DIR}/unifi/config:/config
     ports:
       - 8443:8443
       - 3478:3478/udp
