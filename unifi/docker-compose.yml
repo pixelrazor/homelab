@@ -37,6 +37,7 @@ services:
       traefik.http.routers.unifi.middlewares: "internal-ipallowlist@docker"
       traefik.http.services.unifi.loadbalancer.server.port: "8443"
       traefik.http.services.unifi.loadbalancer.server.scheme: "https"
+      com.centurylinklabs.watchtower.enable: "true"
 networks:
   traefik:
     external: true

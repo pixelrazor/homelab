@@ -1,0 +1,53 @@
+version: "3.6"
+services:
+  mealie:
+    container_name: mealie
+    deploy:
+      resources:
+        limits:
+          memory: 1000M
+    volumes:
+      - ${DATA_DIR}/mealie/data:/app/data/
+    environment:
+      - ALLOW_SIGNUP=false
+      - BASE_URL=https://mealie.${BASE_DOMAIN}
+      - DB_ENGINE=postgres
+      - POSTGRES_USER=${MEALIE_DBUSER}
+      - POSTGRES_PASSWORD=${MEALIE_DBPASS}
+      - POSTGRES_SERVER=${MEALIE_DBHOST}
+      - POSTGRES_PORT=${MEALIE_DBPORT}
+      - POSTGRES_DB=${MEALIE_DBNAME}
+      - TZ=${TZ}
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_FROM_EMAIL=${EMAIL}
+      - SMTP_PASSWORD=${SMTP_PASS}
+      - LDAP_AUTH_ENABLED=true
+      - LDAP_SERVER_URL=${LDAP_SERVER_URL}
+      - LDAP_BASE_DN=${MEALIE_LDAP_BASE_DN}
+      - LDAP_USER_FILTER=${MEALIE_LDAP_USER_FILTER}
+      - LDAP_ADMIN_FILTER=${MEALIE_LDAP_ADMIN_FILTER}
+      - LDAP_QUERY_BIND=${MEALIE_LDAP_QUERY_BIND}
+      - LDAP_QUERY_PASSWORD=${MEALIE_LDAP_QUERY_PASSWORD}
+      - LDAP_ID_ATTRIBUTE=uid
+      - LDAP_NAME_ATTRIBUTE=displayName
+      - LDAP_MAIL_ATTRIBUTE=mail
+      - THEME_LIGHT_PRIMARY=#A600C7
+      - THEME_DARK_PRIMARY=#A600C7
+    image: ghcr.io/mealie-recipes/mealie:v2.7.1
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.mealie.entrypoints: https
+      traefik.http.routers.mealie.middlewares: internal-ipallowlist@docker
+      traefik.http.services.mealie.loadbalancer.server.port: "9000"
+      com.centurylinklabs.watchtower.enable: "true"
+    networks:
+      - traefik
+    restart: unless-stopped
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}

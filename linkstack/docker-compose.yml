@@ -13,6 +13,7 @@ services:
       traefik.http.routers.linkstack.entrypoints: https
       traefik.http.services.linkstack.loadbalancer.server.port: "443"
       traefik.http.services.linkstack.loadbalancer.server.scheme: "https"
+      com.centurylinklabs.watchtower.enable: "true"
     networks:
       - traefik
     restart: unless-stopped

@@ -1,0 +1,41 @@
+version: "3.6"
+services:
+  watchtower:
+    container_name: "watchtower"
+    environment:
+      - "TZ=${TZ}"
+      - "WATCHTOWER_NO_STARTUP_MESSAGE=true"
+      - "WATCHTOWER_CLEANUP=true"
+      - "WATCHTOWER_LABEL_ENABLE=true"
+      - "WATCHTOWER_TIMEOUT=120s"
+      - "WATCHTOWER_ROLLING_RESTART=true"
+      - "WATCHTOWER_SCHEDULE=0 0 15 * * *"
+      - |-
+        WATCHTOWER_NOTIFICATION_TEMPLATE=
+        {{- with .Report -}}
+        {{- if (or .Updated .Skipped .Failed) -}}
+        {{len .Scanned}} Scanned, {{len .Updated}} Updated, {{len .Skipped}}, {{len .Failed}} Failed
+        {{- range .Updated}}
+        - {{.Name}} ({{.ImageName}}): {{.CurrentImageID.ShortID}} updated to {{.LatestImageID.ShortID}}
+        {{- end -}}
+        {{- range .Skipped}}
+        - {{.Name}} ({{.ImageName}}): {{.State}}: {{.Error}}
+        {{- end -}}
+        {{- range .Failed}}
+        - **`{{.Name}}` ({{.ImageName}})**: {{.State}}: {{.Error}}
+        {{- end -}}
+        {{- end -}
+        {{- end -}}
+      - "WATCHTOWER_NOTIFICATION_REPORT=true"
+      - "WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_NOTIFICATION_URL}"
+      - "WATCHTOWER_NOTIFICATIONS_HOSTNAME=pixelblue"
+    image: "containrrr/watchtower:latest"
+    networks:
+      - "traefik"
+    restart: "unless-stopped"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}

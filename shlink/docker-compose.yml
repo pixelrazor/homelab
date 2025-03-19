@@ -17,6 +17,7 @@ services:
       traefik.http.routers.shlink.entrypoints: "https"
       traefik.http.routers.shlink.rule: "Host(`goto.${BASE_DOMAIN}`)"
       traefik.http.services.shlink.loadbalancer.server.port: "8080"
+      com.centurylinklabs.watchtower.enable: "true"
     networks:
       - "traefik"
     restart: "unless-stopped"
@@ -35,6 +36,7 @@ services:
       traefik.http.routers.shlink-ui.middlewares: "authelia@docker"
       traefik.http.routers.shlink-ui.rule: "Host(`shlink.${BASE_DOMAIN}`)"
       traefik.http.services.shlink-ui.loadbalancer.server.port: "80"
+      com.centurylinklabs.watchtower.enable: "true"
     networks:
       - "traefik"
     restart: "unless-stopped"

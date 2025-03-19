@@ -8,6 +8,6 @@ services:
       - "9001:9001"
     restart: "unless-stopped"
     volumes:
-      - "${DATA_DIR}/mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf"
+      - "${DATA_DIR}/mosquitto/config:/mosquitto/config"
       - "${DATA_DIR}/mosquitto/data:/mosquitto/data"
       - "${DATA_DIR}/mosquitto/log:/mosquitto/log"

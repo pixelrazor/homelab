@@ -12,6 +12,7 @@ services:
       traefik.enable: "true"
       traefik.http.routers.lldap.entrypoints: "https"
       traefik.http.services.lldap.loadbalancer.server.port: "17170"
+      com.centurylinklabs.watchtower.enable: "true"
     networks:
       - "traefik"
     ports:

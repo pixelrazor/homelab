@@ -12,6 +12,7 @@ services:
       traefik.http.routers.sabnzbd.entrypoints: https
       traefik.http.routers.sabnzbd.middlewares: authelia@docker,internal-ipallowlist@docker
       traefik.http.services.sabnzbd.loadbalancer.server.port: "8080"
+      com.centurylinklabs.watchtower.enable: "true"
     networks:
       - traefik
     restart: unless-stopped

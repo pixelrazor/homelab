@@ -41,6 +41,7 @@ services:
       traefik.http.routers.paperless.entrypoints: "https"
       traefik.http.routers.paperless.middlewares: "internal-ipallowlist@docker"
       traefik.http.services.paperless.loadbalancer.server.port: "8000"
+      com.centurylinklabs.watchtower.enable: "true"
     networks:
       - "traefik"
       - "default"

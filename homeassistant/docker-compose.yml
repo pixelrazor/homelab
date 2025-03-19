@@ -14,6 +14,7 @@ services:
       traefik.http.routers.homeassistant.entrypoints: "https"
       traefik.http.routers.homeassistant.rule: "Host(`ha.${BASE_DOMAIN}`)"
       traefik.http.services.homeassistant.loadbalancer.server.port: "8123"
+      com.centurylinklabs.watchtower.enable: "true"
     network_mode: "host"
     restart: "unless-stopped"
     volumes:

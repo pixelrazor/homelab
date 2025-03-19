@@ -12,16 +12,15 @@ services:
       traefik.enable: "true"
       traefik.http.routers.plex.entrypoints: "https"
       traefik.http.services.plex.loadbalancer.server.port: "32400"
+      com.centurylinklabs.watchtower.enable: "true"
     networks:
       - "traefik"
     ports:
       - "32400:32400/tcp"
     restart: "unless-stopped"
     volumes:
-      - "${DATA_DIR}/plex/tv:/tv"
+      - "${DATA_DIR}/data/media:/data/media"
       - "${DATA_DIR}/plex/config:/config"
-      - "${DATA_DIR}/plex/home_movies:/home_movies"
-      - "${DATA_DIR}/plex/movies:/movies"
   tautulli:
     container_name: "tautulli"
     environment:
@@ -33,6 +32,7 @@ services:
       traefik.enable: "true"
       traefik.http.routers.tautulli.entrypoints: "https"
       traefik.http.services.tautulli.loadbalancer.server.port: "8181"
+      com.centurylinklabs.watchtower.enable: "true"
     networks:
       - "traefik"
     restart: "unless-stopped"

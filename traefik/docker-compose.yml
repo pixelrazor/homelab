@@ -16,6 +16,7 @@ services:
       traefik.http.routers.dashboard.middlewares: "internal-ipallowlist@docker,authelia@docker"
       traefik.http.routers.dashboard.service: "api@internal"
       traefik.tcp.middlewares.internal-ipallowlist.ipallowlist.sourcerange: "127.0.0.1/32,192.168.0.0/16,172.16.0.0/20"
+      com.centurylinklabs.watchtower.enable: "true"
     networks:
       - "traefik"
     ports:
