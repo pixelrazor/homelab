@@ -1,0 +1,27 @@
+version: "3.6"
+services:
+  piper:
+    container_name: piper
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - PIPER_VOICE=glados
+    image: lscr.io/linuxserver/piper:latest 
+    labels:
+      #traefik.enable: "true"
+      #traefik.http.routers.piper.entrypoints: https
+      #traefik.http.routers.piper.middlewares: authelia@docker,internal-ipallowlist@docker
+      #traefik.http.services.piper.loadbalancer.server.port: "8989"
+      com.centurylinklabs.watchtower.enable: "true"
+    networks:
+      - traefik
+    restart: unless-stopped
+    volumes:
+      - ${DATA_DIR}/piper/config:/config
+    ports:
+      - 10200:10200
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}

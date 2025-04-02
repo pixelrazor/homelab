@@ -1,0 +1,27 @@
+version: "3.6"
+services:
+  whisper:
+    container_name: whisper
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - WHISPER_MODEL=tiny-int8
+    image: lscr.io/linuxserver/faster-whisper:latest 
+    labels:
+      #traefik.enable: "true"
+      #traefik.http.routers.whisper.entrypoints: https
+      #traefik.http.routers.whisper.middlewares: authelia@docker,internal-ipallowlist@docker
+      #traefik.http.services.whisper.loadbalancer.server.port: "8989"
+      com.centurylinklabs.watchtower.enable: "true"
+    networks:
+      - traefik
+    restart: unless-stopped
+    volumes:
+      - ${DATA_DIR}/whisper/config:/config
+    ports:
+      - 10300:10300
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}
