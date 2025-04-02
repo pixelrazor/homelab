@@ -1,0 +1,24 @@
+version: "3.6"
+services:
+  matter:
+    container_name: matter
+    environment:
+      - TZ=${TZ}
+    image: ghcr.io/home-assistant-libs/python-matter-server:stable
+    labels:
+      #traefik.enable: "true"
+      #traefik.http.routers.matter.entrypoints: https
+      #traefik.http.routers.matter.middlewares: authelia@docker,internal-ipallowlist@docker
+      #traefik.http.services.matter.loadbalancer.server.port: "8989"
+      com.centurylinklabs.watchtower.enable: "true"
+    networks:
+      - traefik
+    restart: unless-stopped
+    volumes:
+      - ${DATA_DIR}/matter/data:/data
+    ports:
+      - 5580:5580
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}
